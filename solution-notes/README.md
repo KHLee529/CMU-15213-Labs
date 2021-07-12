@@ -1,10 +1,10 @@
-# CMU 15213 Labs
+# Lab Solution Notes
 
-Labs of CMU 15213 (Introduction to Computer Systems).
+These are notes of solving process of the Labs.
 
 ## Process
 
-- [x] Data Lab
+- [ ] Data Lab
 - [ ] Bomb Lab
 - [ ] Attack Lab
 - [ ] Buffer Lab
