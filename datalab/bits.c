@@ -182,6 +182,10 @@ int isTmax(int x) {
  *   Max ops: 12
  *   Rating: 2
  */
+/*
+ * Strategy:
+ *  get all odd bits of x and check if it is equal to x
+ */
 int allOddBits(int x) {
     int t = 0xaa;
     t |= (t << 8);
@@ -195,6 +199,11 @@ int allOddBits(int x) {
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
  *   Rating: 2
+ */
+/*
+ * Strategy:
+ *  by definition ~x + 1
+ *  with exception Tmin
  */
 int negate(int x) {
   return (~x + 1);
@@ -229,7 +238,7 @@ int isAsciiDigit(int x) {
  */
 /*
  * Strategy:
- *  set judge to 0xffffffff if x else 0x0
+ *  set judge to 0xffffffff if (x != 0) else 0x0
  */
 int conditional(int x, int y, int z) {
     int judge = !!x;
@@ -305,7 +314,7 @@ int logicalNeg(int x) {
  *             two's complement
  *  Examples: howManyBits(12) = 5 (01100)
  *            howManyBits(298) = 10 (0100101010)
- *            howManyBits(-5) = 4 (10010)
+ *            howManyBits(-5) = 4 (1011)
  *            howManyBits(0)  = 1 (0)
  *            howManyBits(-1) = 1 (1)
  *            howManyBits(0x80000000) = 32 (0x80000000)
@@ -315,16 +324,54 @@ int logicalNeg(int x) {
  */
 /*
  * Strategy:
- * scan from the right most bit and found the start of unchange series
+ *  fine the first bit which diff from the sign bit and add 1
+ *  search algorithm: Binary search
  */
 int howManyBits(int x) {
-    int mask = 0xff;
+    int Tmin = 1 << 31; // 0x80000000
+    int sign = x & Tmin; // 1 if x < 0 else 0
+    int test = sign >> 31; // 0xffffffff if x < 0 else 0x0
+    int std = 0; // check base
+    int movstp = 16; // move step
+    int mov = movstp;
+    int out = 1;
+    int tmp = 0;
+
+    movstp = 16;
+    mov = std + movstp;
+    tmp = !!((x >> mov) ^ test); // 1 if left most (cnt + msk) bit == test  
+    tmp = tmp << 31 >> 31; // 0xffffffff if x >> msk == test else 0x0
+    std += movstp & tmp;
     
-    mask |= mask << 8;
-    mask <<= 16;
-    
-    
-    return 2;
+    movstp >>= 1; // movstp == 8
+    mov = std + movstp; 
+    tmp = !!((x >> mov) ^ test); // 1 if left most (cnt + msk) bit == test  
+    tmp = tmp << 31 >> 31; // 0xffffffff if x >> msk == test else 0x0
+    std += movstp & tmp;
+
+    movstp >>= 1; // movstp == 4
+    mov = std + movstp; 
+    tmp = !!((x >> mov) ^ test); // 1 if left most (cnt + msk) bit == test  
+    tmp = tmp << 31 >> 31; // 0xffffffff if x >> msk == test else 0x0
+    std += movstp & tmp;
+
+    movstp >>= 1; // movstp == 2
+    mov = std + movstp; 
+    tmp = !!((x >> mov) ^ test); // 1 if left most (cnt + msk) bit == test  
+    tmp = tmp << 31 >> 31; // 0xffffffff if x >> msk == test else 0x0
+    std += movstp & tmp;
+
+    movstp >>= 1; // movstp = 1
+    mov = std + movstp;
+    tmp = !!((x >> mov) ^ test); // 1 if left most (cnt + msk) bit == test  
+    std += tmp;
+
+    mov = std;
+    tmp = !!((x >> mov) ^ test); // 1 if left most (cnt + msk) bit == test  
+    std += tmp;
+    out += std;
+
+    return out;
 }
 
 //float
