@@ -143,8 +143,9 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return 2;
+    return (~(~x & ~y) & ~(x & y));
 }
+
 /* 
  * tmin - return minimum two's complement integer 
  *   Legal ops: ! ~ & ^ | + << >>
@@ -152,10 +153,9 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
-
+    return (1 << 31);
 }
+
 //2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
@@ -164,9 +164,16 @@ int tmin(void) {
  *   Max ops: 10
  *   Rating: 1
  */
+/*
+ * Strategy:
+ *  ~(Tmax + 1) == Tmax
+ * Notice:
+ *  ~(Tmin + 1) == Tmin, TOO 
+ */
 int isTmax(int x) {
-  return 2;
+  return !!(~x) & !(~(x + 1) ^ x);
 }
+
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   where bits are numbered from 0 (least significant) to 31 (most significant)
@@ -176,8 +183,12 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+    int t = 0xaa;
+    t |= (t << 8);
+    t |= (t << 16);
+    return !((t & x) ^ t);
 }
+
 /* 
  * negate - return -x 
  *   Example: negate(1) = -1.
@@ -186,8 +197,9 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return (~x + 1);
 }
+
 //3
 /* 
  * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0' to '9')
@@ -198,9 +210,16 @@ int negate(int x) {
  *   Max ops: 15
  *   Rating: 3
  */
-int isAsciiDigit(int x) {
-  return 2;
+int isAsciiDigit(int x) { 
+    int j1 = !((x >> 4) ^ 3); // (0x30 <= x <= 0x3f)
+    int j2, j3;
+
+    x &= 0x0f;
+    j2 = !(x >> 3); // (0x30 <= x <= 0x37)
+    j3 = !((x >> 1) ^ 4); // (0x38 <= x <= 0x39)
+    return j1 & (j2 | j3);
 }
+
 /* 
  * conditional - same as x ? y : z 
  *   Example: conditional(2,4,5) = 4
@@ -208,9 +227,21 @@ int isAsciiDigit(int x) {
  *   Max ops: 16
  *   Rating: 3
  */
+/*
+ * Strategy:
+ *  set judge to 0xffffffff if x else 0x0
+ */
 int conditional(int x, int y, int z) {
-  return 2;
+    int judge = !!x;
+
+    judge |= judge << 1;
+    judge |= judge << 2;
+    judge |= judge << 4;
+    judge |= judge << 8;
+    judge |= judge << 16;
+    return (y & judge) | (z & ~judge);
 }
+
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
  *   Example: isLessOrEqual(4,5) = 1.
@@ -218,9 +249,36 @@ int conditional(int x, int y, int z) {
  *   Max ops: 24
  *   Rating: 3
  */
+/*
+ * Strategy:
+ *  x <= y -> x == y or (x - y) < 0 [signbit(x - y) == 1];
+ *  -x == ~x + 1 except for Tmin (~Tmin + 1 = Tmin)
+ *  if sign(x) == sign(y):
+ *      set sign bit of x and y to 0
+ *      then compare x - y
+ *  else:
+ *      return true if x < 0 (signbit(x) == 1)
+ */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    int Tmin = 1 << 31; // Signbit == Tmin == 0x80000000
+    int iseq = !(x ^ y); // x == y? 1; 0;
+    int xsign = Tmin & x;
+    int ysign = Tmin & y;
+    int sset = (~(xsign ^ ysign) ^ Tmin); // sign(x) == sign(y)? 0x7ffffffff: 0xffffffff;
+    int isless = 0;
+    int ismx = 0;
+
+    // get rid of sign bit if sign(x) == sign(y)
+    x &= sset;
+    y &= sset;
+    // x - y < 0 when sign(x) == sign(y)
+    isless = x + ~y + 1; // count x - y;
+    isless = !!(isless & ~sset); // set to 0 if sign(x) = sign(y) else 1
+    // is minus x
+    ismx = !!(x & Tmin);
+    return iseq | isless | ismx;
 }
+
 //4
 /* 
  * logicalNeg - implement the ! operator, using all of 
@@ -230,25 +288,53 @@ int isLessOrEqual(int x, int y) {
  *   Max ops: 12
  *   Rating: 4 
  */
+/*
+ * Strategy:
+ *  "or" all the bits to the right most bit then return that one
+ */
 int logicalNeg(int x) {
-  return 2;
+    x |= x >> 16;
+    x |= x >> 8;
+    x |= x >> 4;
+    x |= x >> 2;
+    x |= x >> 1;
+    return (~x & 1);
 }
+
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
- *  Examples: howManyBits(12) = 5
- *            howManyBits(298) = 10
- *            howManyBits(-5) = 4
- *            howManyBits(0)  = 1
- *            howManyBits(-1) = 1
- *            howManyBits(0x80000000) = 32
+ *  Examples: howManyBits(12) = 5 (01100)
+ *            howManyBits(298) = 10 (0100101010)
+ *            howManyBits(-5) = 4 (10010)
+ *            howManyBits(0)  = 1 (0)
+ *            howManyBits(-1) = 1 (1)
+ *            howManyBits(0x80000000) = 32 (0x80000000)
  *  Legal ops: ! ~ & ^ | + << >>
  *  Max ops: 90
  *  Rating: 4
  */
+/*
+ * Strategy:
+ * scan from the right most bit and found the start of unchange series
+ */
 int howManyBits(int x) {
-  return 0;
+    int mask = 0xff;
+    
+    mask |= mask << 8;
+    mask <<= 16;
+    
+    
+    return 2;
 }
+
 //float
+/* 
+ * float bitmaps
+ * 0    00000000 00000000000000000000000
+ * sign E        M
+ * sign: 0: +, 1: -
+ * f = M * 2 ^ (E - 2^8)
+ */
 /* 
  * floatScale2 - Return bit-level equivalent of expression 2*f for
  *   floating point argument f.
@@ -261,8 +347,22 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+    int sign = uf & (1 << 31);
+    int e = (uf >> 23) & 0xff;
+    int m = uf & 0x007fffff;
+    int out = 0;
+    
+    if (!(uf & 0x7fffffff)) return uf; // uf == +0 || uf == -0
+    if (!e) return sign | (uf << 1);
+    if (e == 0xff)  return uf;
+    if (e == 0xfe)  return sign | 0x7f800000;
+    e += 1;
+    out |= sign;
+    out |= e << 23;
+    out |= m;
+    return out;
 }
+
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
@@ -276,8 +376,29 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+    int sign = uf & (1 << 31);
+    int e = (uf >> 23) & 0xff;
+    int m = uf & 0x007fffff;
+    int out = 0;
+
+    if (e == 0xff) return 0x80000000; // NaN or inf
+    if (e < 0x7f) return 0; // 2^e < 1;
+    else if (e == 0x7f) return sign? -1: 1; // 2^e == 1;
+
+    e -= 0x7f;
+    m |= 0x00800000;
+    if (e < 24) {
+        out = (m >> (24 - e));
+        return sign? -out: out;
+    } else if (e == 24) {
+        out = m;
+        return sign? -out: out;
+    } else if (m < 33){
+        out = (m << (e - 24));
+    }
+    return 0x80000000;
 }
+
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
  *   (2.0 raised to the power x) for any 32-bit integer x.
@@ -292,5 +413,17 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+    unsigned out = 0;
+
+    if (x > 127) {
+        out = 0x7f800000;
+    } else if (x < -150) {
+        out = 0;
+    } else if (x < -126) {
+        out = 1 << (x + 150);
+    } else {
+        out = (x + 127);
+        out = out << 23;
+    } 
+    return out;
 }
