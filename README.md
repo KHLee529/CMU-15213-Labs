@@ -6,7 +6,7 @@ http://csapp.cs.cmu.edu/3e/labs.html
 ## Process
 
 - [x] Data Lab
-- [ ] Bomb Lab
+- [x] Bomb Lab
 - [ ] Attack Lab
 - [ ] Buffer Lab
 - [ ] Architecture Lab
