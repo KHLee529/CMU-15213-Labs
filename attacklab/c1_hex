@@ -1,0 +1,6 @@
+61 62 63 64 65 66 67 68 /* garbage words */
+69 70 71 72 73 74 75 76 /* garbage words */
+c0 dc 61 55 61 62 63 64 /* garbage words */
+65 66 67 68 69 70 71 72 /* garbage words */
+73 74 75 76 77 78 79 7A /* garbage words */
+c0 17 40 00 /* the start of function touch1 */
