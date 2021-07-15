@@ -6,15 +6,18 @@
   40199a:	b8 fb 78 90 90       	mov    $0x909078fb,%eax
   40199f:	c3                   	retq   
 
-00000000004019a0 <addval_273>: ; movq %rax,%rdi / 
+; movq %rax,%rdi; retq // 48 89 c7 c3
+; movl $eax,%edi; retq // 89 c7 c3
+00000000004019a0 <addval_273>:
   4019a0:	8d 87 48 89 c7 c3    	lea    -0x3c3876b8(%rdi),%eax
   4019a6:	c3                   	retq   
 
+; popq %rax; nop; retq // 58 90 c3
 00000000004019a7 <addval_219>:
   4019a7:	8d 87 51 73 58 90    	lea    -0x6fa78caf(%rdi),%eax
   4019ad:	c3                   	retq   
 
-00000000004019ae <setval_237>: ; movq 
+00000000004019ae <setval_237>:
   4019ae:	c7 07 48 89 c7 c7    	movl   $0xc7c78948,(%rdi)
   4019b4:	c3                   	retq   
 
@@ -26,10 +29,12 @@
   4019bc:	c7 07 63 48 8d c7    	movl   $0xc78d4863,(%rdi)
   4019c2:	c3                   	retq   
 
+; movq %rax,%rdi; retq // 48 89 c7 c3
 00000000004019c3 <setval_426>:
   4019c3:	c7 07 48 89 c7 90    	movl   $0x90c78948,(%rdi)
   4019c9:	c3                   	retq   
 
+; popq %rax; nop; retq // 58 90 c3
 00000000004019ca <getval_280>:
   4019ca:	b8 29 58 90 c3       	mov    $0xc3905829,%eax
   4019cf:	c3                   	retq   
