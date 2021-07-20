@@ -9,7 +9,7 @@ Labs of CMU 15213 (Introduction to Computer Systems). ((link)[http://csapp.cs.cm
 - [x] Attack Lab
 - [ ] Buffer Lab
 - [ ] Architecture Lab
-- [ ] Cache Lab
+- [x] Cache Lab
 - [ ] Performance Lab
 - [ ] Shell Lab
 - [ ] Malloc Lab
