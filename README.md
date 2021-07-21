@@ -1,6 +1,7 @@
 # CMU 15213 Labs
 
-Labs of CMU 15213 (Introduction to Computer Systems). ((link)[http://csapp.cs.cmu.edu/3e/labs.html])
+Labs of CMU 15213 (Introduction to Computer Systems).
+<http://csapp.cs.cmu.edu/3e/labs.html>
 
 ## Process
 
