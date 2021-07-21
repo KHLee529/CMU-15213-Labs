@@ -19,9 +19,39 @@ int is_transpose(int M, int N, int A[N][M], int B[M][N]);
  *     searches for that string to identify the transpose function to
  *     be graded. 
  */
+
+#define WIDTH 8
+#define HEIGHT 100
+
 char transpose_submit_desc[] = "Transpose submission";
 void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 {
+    int i, j, ii, jj;
+    int tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+    for (ii = 0; ii < N; ii += HEIGHT) { 
+        for (jj = 0; jj < M; jj += WIDTH) {
+            for (i = ii; i < N && i < ii + HEIGHT; i++) {
+                j = jj;
+                tmp0 = A[i][j+0];
+                tmp1 = A[i][j+1];
+                tmp2 = A[i][j+2];
+                tmp3 = A[i][j+3];
+                tmp4 = A[i][j+4];
+                tmp5 = A[i][j+5];
+                tmp6 = A[i][j+6];
+                tmp7 = A[i][j+7];
+
+                B[j+0][i] = tmp0;
+                B[j+1][i] = tmp1;
+                B[j+2][i] = tmp2;
+                B[j+3][i] = tmp3;
+                B[j+4][i] = tmp4;
+                B[j+5][i] = tmp5;
+                B[j+6][i] = tmp6;
+                B[j+7][i] = tmp7;
+            }
+        }
+    }
 }
 
 /* 
