@@ -6,8 +6,13 @@ Labs of CMU 15213 (Introduction to Computer Systems).
 ## Process
 
 - [x] Data Lab
+<<<<<<< HEAD
 - [ ] Bomb Lab
 - [x] Attack Lab
+=======
+- [x] Bomb Lab
+- [ ] Attack Lab
+>>>>>>> bomb
 - [ ] Buffer Lab
 - [ ] Architecture Lab
 - [ ] Cache Lab
@@ -15,4 +20,3 @@ Labs of CMU 15213 (Introduction to Computer Systems).
 - [ ] Shell Lab
 - [ ] Malloc Lab
 - [ ] Proxy Lab
-
