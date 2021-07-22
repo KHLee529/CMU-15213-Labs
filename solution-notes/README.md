@@ -6,7 +6,7 @@ These are notes of solving process of the Labs.
 
 - [x] Data Lab
 - [ ] Bomb Lab
-- [ ] Attack Lab
+- [x] Attack Lab
 - [ ] Buffer Lab
 - [ ] Architecture Lab
 - [ ] Cache Lab
@@ -14,4 +14,3 @@ These are notes of solving process of the Labs.
 - [ ] Shell Lab
 - [ ] Malloc Lab
 - [ ] Proxy Lab
-
