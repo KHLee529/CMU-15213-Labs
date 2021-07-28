@@ -5,7 +5,7 @@ These are notes of solving process of the Labs.
 ## Process
 
 - [x] Data Lab
-- [ ] Bomb Lab
+- [x] Bomb Lab
 - [x] Attack Lab
 - [ ] Buffer Lab
 - [ ] Architecture Lab
