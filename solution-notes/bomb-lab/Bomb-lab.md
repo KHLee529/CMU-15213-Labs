@@ -25,8 +25,9 @@ The common usage of each register are
 
 ## Instructions
 
-mov 0x20($rsp),$rbx -> rbx is the content of ($rsp + 0x20)
-lea 0x20($rsp),$rbx -> rbx = $rsp + 0x20
+Notice: \
+`mov 0x20(%rsp),%rbx` => `%rbx` is the content of `(%rsp + 0x20)` \
+`lea 0x20(%rsp),%rbx` => `%rbx` = `%rsp + 0x20`
 
 ## Phase 1
 
@@ -44,9 +45,10 @@ The assembly codes of Phase 1 bomb is shown below
   400efb: c3                    retq   
 ```
 
-By the function names at `400ee9` and `400ef2`, it's obvious that this phase 1
-function only do a comparison between the input string (already saved in %rdi)
-and a string saved in memory address `0x402400`.
+By the names of functions called in this phase (`string_not_equal` and
+`explode_bomb`), it's obvious that this phase 1 function only do a comparison
+between the input string (already saved in `%rdi`) and a string saved in memory
+address `0x402400`.
 
 Therefore, using gdb we can print out the string in `0x402400` and write that
 into the first line of the input file.
@@ -93,7 +95,7 @@ The assmbly codes of Phase 2 are
 
 First, it calls a function `read_six_numbers`, so I guess that in this
 phase, the password is a string composed of 6 numbers.
-Next, I figure out the main process flow.
+Next, I figure out the main program flow.
 
 - start function
 - read 6 number to rsp (&nums = $rsp)
@@ -149,29 +151,29 @@ The assmbly codes of Phase 3 are
   400fcd: c3                    retq   
 ```
 
-In this phase, first I find a `sscanf` at the beginning of the function.
-By taking the 2nd parameter of `sscanf`, I found the input should be 2 integers.
-And then, through the instruction `0x400f6f`, the bomb will explode if the 1st
-number is greater than 7.
+In this phase, first I found a `sscanf` function call at the beginning of the
+function. By taking the 2nd parameter of `sscanf`, I found the input should be
+2 integers. And then, through the instruction `0x400f6f`, the bomb will explode
+if the 1st number is greater than 7.
 
-Later, observing the instruction `0x400f75`, the instruction jump to the
-corresponding instruction depending on the 1st given number.
+Later, depending on the 1st given number, the jumping instruction `0x400f75`
+jumps to the corresponding instruction.
 
 The relations between given numbers and the jumping destinations are
 
-- 0: 0x0000000000400f7c
-- 1: 0x0000000000400fb9
-- 2: 0x0000000000400f83
-- 3: 0x0000000000400f8a
-- 4: 0x0000000000400f91
-- 5: 0x0000000000400f98
-- 6: 0x0000000000400f9f
-- 7: 0x0000000000400fa6
+- 0: `0x400f7c` (key = `0xcf`)
+- 1: `0x400fb9` (key = `0x137`)
+- 2: `0x400f83` (key = `0x2c3`)
+- 3: `0x400f8a` (key = `0x100`)
+- 4: `0x400f91` (key = `0x185`)
+- 5: `0x400f98` (key = `0xce`)
+- 6: `0x400f9f` (key = `0x2aa`)
+- 7: `0x400fa6` (key = `0x147`)
 
 Finally, check if the 2nd given number equals the corresponding key number.
 
-Therefore, there are 8 sets of the available password to phase 3. Choose one of
-them to defuse this phase
+Therefore, there are 8 sets of the valid password to phase 3. Choose one of
+them to defuse this phase.
 
 Phase 3 solved!!
 
@@ -220,7 +222,7 @@ void phase_3(input_string) {
 
 ## Phase 4
 
-The assmbly codes of Phase 3 are
+The assmbly codes of Phase 4 are
 
 ```s
 000000000040100c <phase_4>:
@@ -280,12 +282,12 @@ The assembly code of `func4` are
   40100b: c3                    retq   
 ```
 
-In `funct4` it is not difficult to understand what it does by going through the
-assembly codes.
-The thing we should care about in this phase is the parameter transfer between
-caller and callee, so its important to know that the `func4` is called in the
-form `func4(given_num1, 0, 14)`, then it's easy to figure out the valid keyword
-of this phase.
+In `func4`, it is not difficult to understand what it does by going through the
+assembly codes. \
+The thing we should care about in this phase is how parameters are transfered
+between caller and callee, so it's important to know that the `func4` is called
+in the form `func4(given_num1, 0, 14)`. Then it's easy to figure out the valid
+password of this phase.
 
 Phase 4 solved!!
 
@@ -337,19 +339,19 @@ The assembly codes of phase 5 are
   4010f3: c3                    retq
 ```
 
-We can know that the input should be a 6 characters string by the code from the
+We can know that the input should be a 6 characters string by the codes from the
 beginning to line `0x401082`. \
-After checking the string length, it will start the main process of this phase,
+After verifying the string length, it starts the main process of this phase,
 which are lines between line `0x40108b` and line `0x4010d7`.
 
 By analyzing the main program flow of the main process, I got the pseudo code
 
 ```c
 /* ... preprocess ... */
-char s[7]; // store in 0x10(%rsp)
+char s[7]; // stored in 0x10(%rsp)
 
 /*
- * the "code" array is store in memory address 0x4024b0
+ * the "code" array is stored in memory address 0x4024b0
  * 0x4024b0: 0x6d 0x61 0x64 0x75 0x69 0x65 0x72 0x73
  * 0x4024b8: 0x6e 0x66 0x6f 0x74 0x76 0x62 0x79 0x6c
  */
@@ -382,8 +384,8 @@ if (string_not_equal(s, "flyers")){
 /* ... postprocess ... */
 ```
 
-Going through this process, the valid input is a sequence with their least
-important four bits are the index of `"flyers"` in array `code`. \
+Going through this process, the valid input is a sequence of which the least
+significant four bits are the index of `"flyers"` in array `code`. \
 The corresponding ascii representation of `"flyers"` are
 
 ```c
@@ -396,18 +398,19 @@ Therefore the index should be
 0x9, 0xf, 0xe, 0x5, 0x6, 0x7
 ```
 
-Finally, I find a string with their last four bits match the indices, `"ionefg"`.
+Finally, I found a string with their least significant four bits match the
+indices, `"ionefg"`.
 
 Phase 5 solved!!
 
 ## Phase 6
 
-The assembly codes of this phase are too many and hard to understand so I
+The assembly codes of this phase are too many and too hard to understand so I
 separated the codes into several parts.
 
 ### Part 1
 
-First, from the beginning to line `0x401123`, it check if the inputs are six
+First, from the beginning to line `0x401123`, it verifies if the inputs are six
 integers, and then get into the first loop.
 
 ```s
@@ -483,10 +486,10 @@ for (int i = 0, *p = nums; i < 6; i++, p++) {
 
 However, in this part we can see two different forms of looping an array.
 
-- get `(%rsp,%rax,4)` and add %rax by 1 every step which is more like the form \
-  `for (int i = 0; i < 6; i++)`
-- get `%r13` and add it by 4 every step which is similar to the form \
-  `for (int *p = nums;; p++)`
+- get `(%rsp,%rax,4)` and add `%rax` by 1 every step, \
+  which is more like the form `for (int i = 0; i < 6; i++)`
+- get `%r13` and add it by 4 every step, \
+  which is similar to the form `for (int *p = nums;; p++)`
 
 ### Part 2
 
@@ -512,11 +515,11 @@ Here comes the other ways to iterate an array, which is finding the end address
 and check if the iterator equal to that address and look like \
 `for (int *p = nums; p != (end_addr); p++)`
 
-In this part, it substitute all numbers `nums[i]` by `7 - nums[i]`.
+In this part, it substitutes all numbers `nums[i]` by `7 - nums[i]`.
 
 ### Part 3
 
-In this part, after processing on the numbers, it start doing something really
+In this part, after processing on the numbers, it starts doing something really
 obscure. Actually the way I found what this codes did is accidentally look into
 the address `0x20(%rsp)` after these codes and found the result.
 
@@ -560,7 +563,7 @@ contains contents below.
 ```
 
 In these nodes, I found the second half of each memory is the address of
-next node, so I assume that these are nodes of a linked list.
+next node, so I assumed that these are nodes of a linked list.
 
 Assumed structure is
 
@@ -616,9 +619,9 @@ This part is to link the nodes by the sequence of nodes.
 
 ### Part 5
 
-Finally in this part, it check if the sequence are the key of this phase. \
+Finally in this part, it verifys if the sequence are the key of this phase. \
 Going through the assembly codes shown below, I found that the rule for this
-phase is that in the final list the value of a node shouldn't greater then the
+phase is that in the final list, the value of a node shouldn't greater then the
 value of its previous node.
 
 ```s
@@ -657,9 +660,225 @@ to arrange the nodes by descending order of their values, the valid sequence is
 ```
 
 In part 2, it modify the origin input numbers by `nums[i] = 7 - nums[i]`,
-so the final key of this phase is `432165`.
+so the password of this phase is `432165`.
 
 ## Secret Phase
 
-It seems there is a secret phase after phase 6 but I still didn't figure out
-how to trigger it.
+I accidentally discovered this function name in the assembly codes and then
+became a challenger.
+
+There is only one function call of `secret_phase` in function `phase_defused` in
+the whole program.
+
+```s
+00000000004015c4 <phase_defused>:
+  4015c4: 48 83 ec 78           sub    $0x78,%rsp
+  4015c8: 64 48 8b 04 25 28 00  mov    %fs:0x28,%rax
+  4015cf: 00 00 
+  4015d1: 48 89 44 24 68        mov    %rax,0x68(%rsp)
+  4015d6: 31 c0                 xor    %eax,%eax
+  4015d8: 83 3d 81 21 20 00 06  cmpl   $0x6,0x202181(%rip)        # 603760 <num_input_strings>
+  4015df: 75 5e                 jne    40163f <phase_defused+0x7b>
+  4015e1: 4c 8d 44 24 10        lea    0x10(%rsp),%r8
+  4015e6: 48 8d 4c 24 0c        lea    0xc(%rsp),%rcx
+  4015eb: 48 8d 54 24 08        lea    0x8(%rsp),%rdx
+  4015f0: be 19 26 40 00        mov    $0x402619,%esi
+  4015f5: bf 70 38 60 00        mov    $0x603870,%edi
+  4015fa: e8 f1 f5 ff ff        callq  400bf0 <__isoc99_sscanf@plt>
+  4015ff: 83 f8 03              cmp    $0x3,%eax
+  401602: 75 31                 jne    401635 <phase_defused+0x71>
+  401604: be 22 26 40 00        mov    $0x402622,%esi
+  401609: 48 8d 7c 24 10        lea    0x10(%rsp),%rdi
+  40160e: e8 25 fd ff ff        callq  401338 <strings_not_equal>
+  401613: 85 c0                 test   %eax,%eax
+  401615: 75 1e                 jne    401635 <phase_defused+0x71>
+  401617: bf f8 24 40 00        mov    $0x4024f8,%edi
+  40161c: e8 ef f4 ff ff        callq  400b10 <puts@plt>
+  401621: bf 20 25 40 00        mov    $0x402520,%edi
+  401626: e8 e5 f4 ff ff        callq  400b10 <puts@plt>
+  40162b: b8 00 00 00 00        mov    $0x0,%eax
+  401630: e8 0d fc ff ff        callq  401242 <secret_phase>
+  401635: bf 58 25 40 00        mov    $0x402558,%edi
+  40163a: e8 d1 f4 ff ff        callq  400b10 <puts@plt>
+  40163f: 48 8b 44 24 68        mov    0x68(%rsp),%rax
+  401644: 64 48 33 04 25 28 00  xor    %fs:0x28,%rax
+  40164b: 00 00 
+  40164d: 74 05                 je     401654 <phase_defused+0x90>
+  40164f: e8 dc f4 ff ff        callq  400b30 <__stack_chk_fail@plt>
+  401654: 48 83 c4 78           add    $0x78,%rsp
+  401658: c3                    retq   
+```
+
+To reach the `secret_phase` function call, there are two conditions to pass.
+
+1. `jne 40163f <phase_defused+0x7b>` at line `0x4015df`
+2. `jne 401635 <phase_defused+0x71>` at line `0x401602`
+
+The first one can pass easily by pass the 6 phases before. \
+The second one, however, is quite obscure because the address `0x603870`
+appears at only this time in the whole program. \
+By looking into the content of `0x603870`, I found the password I passed to
+phase 4, so I figured out that it is the location of phase 4 password inside
+the `input_strings` array beginning from `0x603780` which appears a lot in
+function `read_line`.
+
+To trigger the secret phase, we have to append a keyword located in `0x402622`
+to the end of phase 4.
+
+The assembly codes of secret phase are
+
+```s
+0000000000401242 <secret_phase>:
+  401242: 53                    push   %rbx
+  401243: e8 56 02 00 00        callq  40149e <read_line>
+  401248: ba 0a 00 00 00        mov    $0xa,%edx
+  40124d: be 00 00 00 00        mov    $0x0,%esi
+  401252: 48 89 c7              mov    %rax,%rdi
+  401255: e8 76 f9 ff ff        callq  400bd0 <strtol@plt>
+  40125a: 48 89 c3              mov    %rax,%rbx
+  40125d: 8d 40 ff              lea    -0x1(%rax),%eax
+  401260: 3d e8 03 00 00        cmp    $0x3e8,%eax
+  401265: 76 05                 jbe    40126c <secret_phase+0x2a>
+  401267: e8 ce 01 00 00        callq  40143a <explode_bomb>
+  40126c: 89 de                 mov    %ebx,%esi
+  40126e: bf f0 30 60 00        mov    $0x6030f0,%edi
+  401273: e8 8c ff ff ff        callq  401204 <fun7>
+  401278: 83 f8 02              cmp    $0x2,%eax
+  40127b: 74 05                 je     401282 <secret_phase+0x40>
+  40127d: e8 b8 01 00 00        callq  40143a <explode_bomb>
+  401282: bf 38 24 40 00        mov    $0x402438,%edi
+  401287: e8 84 f8 ff ff        callq  400b10 <puts@plt>
+  40128c: e8 33 03 00 00        callq  4015c4 <phase_defused>
+  401291: 5b                    pop    %rbx
+  401292: c3                    retq   
+```
+
+The key point in this phase is the function `fun7` with recursion call in it. \
+The argument sent into `fun7` is a binary tree.
+
+```c
+0x6030f0 <n1>:  0x0000000000000024 0x0000000000603110
+0x603100 <n1>:  0x0000000000603130 0x0000000000000000
+0x603110 <n21>: 0x0000000000000008 0x0000000000603190
+0x603120 <n21>: 0x0000000000603150 0x0000000000000000
+0x603130 <n22>: 0x0000000000000032 0x0000000000603170
+0x603140 <n22>: 0x00000000006031b0 0x0000000000000000
+0x603150 <n32>: 0x0000000000000016 0x0000000000603270
+0x603160 <n32>: 0x0000000000603230 0x0000000000000000
+0x603170 <n33>: 0x000000000000002d 0x00000000006031d0
+0x603180 <n33>: 0x0000000000603290 0x0000000000000000
+0x603190 <n31>: 0x0000000000000006 0x00000000006031f0
+0x6031a0 <n31>: 0x0000000000603250 0x0000000000000000
+0x6031b0 <n34>: 0x000000000000006b 0x0000000000603210
+0x6031c0 <n34>: 0x00000000006032b0 0x0000000000000000
+0x6031d0 <n45>: 0x0000000000000028 0x0000000000000000
+0x6031e0 <n45>: 0x0000000000000000 0x0000000000000000
+0x6031f0 <n41>: 0x0000000000000001 0x0000000000000000
+0x603200 <n41>: 0x0000000000000000 0x0000000000000000
+0x603210 <n47>: 0x0000000000000063 0x0000000000000000
+0x603220 <n47>: 0x0000000000000000 0x0000000000000000
+0x603230 <n44>: 0x0000000000000023 0x0000000000000000
+0x603240 <n44>: 0x0000000000000000 0x0000000000000000
+0x603250 <n42>: 0x0000000000000007 0x0000000000000000
+0x603260 <n42>: 0x0000000000000000 0x0000000000000000
+0x603270 <n43>: 0x0000000000000014 0x0000000000000000
+0x603280 <n43>: 0x0000000000000000 0x0000000000000000
+0x603290 <n46>: 0x000000000000002f 0x0000000000000000
+0x6032a0 <n46>: 0x0000000000000000 0x0000000000000000
+0x6032b0 <n48>: 0x00000000000003e9 0x0000000000000000
+0x6032c0 <n48>: 0x0000000000000000 0x0000000000000000
+```
+
+Assume the c code of this binary tree node is
+
+```c
+struct TreeNode {
+    long long val;
+    struct TreeNode *left;
+    struct TreeNode *right;
+}
+```
+
+The original tree should be like
+
+```txt
+                                   @0x6030f0
+                                    +-----+ 
+                                    |0x024| 
+                                    +--+--+ 
+                                     /   \ 
+                         ------------     ------------
+                        /                             \ 
+                       /                               \ 
+                      /                                 \ 
+               @0x603110                               @0x603130
+                +-----+                                 +-----+
+                |0x008|                                 |0x032|
+                +--+--+                                 +--+--+
+                /     \                                 /     \
+               /       \                               /       \
+              /         \                             /         \ 
+             /           \                           /           \
+     @0x603190           @0x603150           @0x6030f0           @0x6031c0
+      +-----+             +-----+             +-----+             +-----+
+      |0x006|             |0x016|             |0x02d|             |0x06b|
+      +--+--+             +--+--+             +--+--+             +--+--+
+       /   \               /   \               /   \               /   \      
+      /     \             /     \             /     \             /     \     
+     /       \           /       \           /       \           /       \    
+    /         \         /         \         /         \         /         \   
+@0x6031f0 @0x603250 @0x603270 @0x603230 @0x6031d0 @0x603290 @0x603210 @0x6032b0
+ +-----+   +-----+   +-----+   +-----+   +-----+   +-----+   +-----+   +-----+
+ |0x001|   |0x007|   |0x014|   |0x023|   |0x028|   |0x02f|   |0x068|   |0x3e9|
+ +--+--+   +--+--+   +--+--+   +--+--+   +--+--+   +--+--+   +--+--+   +--+--+
+```
+
+Next, the assembly codes of function `fun7` are
+
+```s
+0000000000401204 <fun7>:
+  401204: 48 83 ec 08           sub    $0x8,%rsp
+  401208: 48 85 ff              test   %rdi,%rdi
+  40120b: 74 2b                 je     401238 <fun7+0x34>
+  40120d: 8b 17                 mov    (%rdi),%edx
+  40120f: 39 f2                 cmp    %esi,%edx
+  401211: 7e 0d                 jle    401220 <fun7+0x1c>
+  401213: 48 8b 7f 08           mov    0x8(%rdi),%rdi
+  401217: e8 e8 ff ff ff        callq  401204 <fun7>
+  40121c: 01 c0                 add    %eax,%eax
+  40121e: eb 1d                 jmp    40123d <fun7+0x39>
+  401220: b8 00 00 00 00        mov    $0x0,%eax
+  401225: 39 f2                 cmp    %esi,%edx
+  401227: 74 14                 je     40123d <fun7+0x39>
+  401229: 48 8b 7f 10           mov    0x10(%rdi),%rdi
+  40122d: e8 d2 ff ff ff        callq  401204 <fun7>
+  401232: 8d 44 00 01           lea    0x1(%rax,%rax,1),%eax
+  401236: eb 05                 jmp    40123d <fun7+0x39>
+  401238: b8 ff ff ff ff        mov    $0xffffffff,%eax
+  40123d: 48 83 c4 08           add    $0x8,%rsp
+  401241: c3                    retq   
+```
+
+It's not too difficult to understand this function when the used data structure
+has already been clarified. \
+The c code I assume is shown below, and the final goal is to let it return `2`
+to the first function call in `secret_phase`.
+
+```c
+int fun7(struct TreeNode *head, int val)
+{
+    if (!head)
+        return -1;
+    if (head->val > val)
+        return 2 * fun7(head->left, val);
+    else if (head->val < val)
+        return 2 * fun7(head->right, val) + 1;
+    else
+        return 0;
+}
+```
+
+To achieve the goal, the input value must be `head->left->right->val`, and it is
+`0x16` according to the graph above.
+
+Finally, secret phase solved!!!
