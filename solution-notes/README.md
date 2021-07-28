@@ -2,7 +2,7 @@
 
 These are notes of solving process of the Labs.
 
-## Process
+## Progress
 
 - [x] Data Lab
 - [x] Bomb Lab

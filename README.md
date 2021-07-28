@@ -3,7 +3,7 @@
 Labs of CMU 15213 (Introduction to Computer Systems).
 <http://csapp.cs.cmu.edu/3e/labs.html>
 
-## Process
+## Progress
 
 - [x] Data Lab
 - [x] Bomb Lab
