@@ -12,6 +12,6 @@ Labs of CMU 15213 (Introduction to Computer Systems).
 - [ ] Architecture Lab
 - [x] Cache Lab
 - [ ] Performance Lab
-- [ ] Shell Lab
+- [x] Shell Lab
 - [ ] Malloc Lab
 - [ ] Proxy Lab
